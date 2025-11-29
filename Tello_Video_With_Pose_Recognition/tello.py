@@ -2,7 +2,15 @@ import socket
 import threading
 import time
 import numpy as np
-import libh264decoder
+
+# Try to import libh264decoder, fall back to OpenCV-based decoder if unavailable
+try:
+    import libh264decoder
+    print("✓ Using libh264decoder")
+except ImportError:
+    print("⚠ libh264decoder not available, using OpenCV fallback")
+    from opencv_h264_decoder import H264Decoder as h264decoder
+    libh264decoder = type('libh264decoder', (), {'H264Decoder': h264decoder})()
 
 class Tello:
     """Wrapper class to interact with the Tello drone."""

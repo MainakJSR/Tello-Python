@@ -2,7 +2,15 @@ import socket
 import threading
 import time
 import numpy as np
-import libh264decoder
+
+# Try to import libh264decoder, fall back to OpenCV-based decoder if unavailable
+try:
+    import libh264decoder
+    print("✓ Using libh264decoder")
+except ImportError:
+    print("⚠ libh264decoder not available, using OpenCV fallback")
+    from opencv_h264_decoder import H264Decoder as h264decoder
+    libh264decoder = type('libh264decoder', (), {'H264Decoder': h264decoder})()
 
 class Tello:
     """Wrapper class to interact with the Tello drone."""
@@ -44,9 +52,9 @@ class Tello:
 
         # to receive video -- send cmd: command, streamon
         self.socket.sendto(b'command', self.tello_address)
-        print ('sent: command')
+        print('sent: command')
         self.socket.sendto(b'streamon', self.tello_address)
-        print ('sent: streamon')
+        print('sent: streamon')
 
         self.socket_video.bind((local_ip, self.local_video_port))
 
@@ -86,7 +94,7 @@ class Tello:
                 self.response, ip = self.socket.recvfrom(3000)
                 #print(self.response)
             except socket.error as exc:
-                print ("Caught exception socket.error : %s" % exc)
+                print("Caught exception socket.error : %s" % exc)
 
     def _receive_video_thread(self):
         """
@@ -107,7 +115,7 @@ class Tello:
                     packet_data = ""
 
             except socket.error as exc:
-                print ("Caught exception socket.error : %s" % exc)
+                print("Caught exception socket.error : %s" % exc)
     
     def _h264_decode(self, packet_data):
         """
@@ -124,8 +132,8 @@ class Tello:
             if frame is not None:
                 # print 'frame size %i bytes, w %i, h %i, linesize %i' % (len(frame), w, h, ls)
 
-                frame = np.fromstring(frame, dtype=np.ubyte, count=len(frame), sep='')
-                frame = (frame.reshape((h, ls / 3, 3)))
+                frame = np.frombuffer(frame, dtype=np.ubyte, count=len(frame))
+                frame = (frame.reshape((h, ls // 3, 3)))
                 frame = frame[:, :w, :]
                 res_frame_list.append(frame)
 
@@ -140,7 +148,7 @@ class Tello:
 
         """
 
-        print (">> send cmd: {}".format(command))
+        print(">> send cmd: {}".format(command))
         self.abort_flag = False
         timer = threading.Timer(self.command_timeout, self.set_abort_flag)
 

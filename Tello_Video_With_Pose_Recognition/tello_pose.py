@@ -244,15 +244,15 @@ class Tello_Pose:
         # check the captured pose
         if self.is_arms_down_45(points):
             self.arm_down_45_cnt += 1
-            print "%d:arm down captured"%self.frame_cnt
+            print("%d:arm down captured" % self.frame_cnt)
 
         if self.is_arms_flat(points):
             self.arm_flat_cnt += 1
-            print "%d:arm up captured"%self.frame_cnt
+            print("%d:arm up captured" % self.frame_cnt)
 
         if self.is_arms_V(points):
             self.arm_V_cnt += 1
-            print '%d:arm V captured'%self.frame_cnt
+            print('%d:arm V captured' % self.frame_cnt)
 
         self.frame_cnt += 1
        
@@ -273,13 +273,13 @@ class Tello_Pose:
         # certain times of pose recognition   
         if self.frame_cnt == frame_cnt_threshold:
             if self.arm_down_45_cnt >= pose_captured_threshold:
-                print '!!!arm up,move back!!!'
+                print('!!!arm up,move back!!!')
                 cmd =  'moveback'
             if self.arm_flat_cnt >= pose_captured_threshold:
-                print '!!!arm down,moveforward!!!'
+                print('!!!arm down,moveforward!!!')
                 cmd =  'moveforward'
             if self.arm_V_cnt == self.frame_cnt :
-                print '!!!arm V,land!!!'
+                print('!!!arm V,land!!!')
                 cmd =  'land'
             self.frame_cnt = 0
             self.arm_down_45_cnt = 0
