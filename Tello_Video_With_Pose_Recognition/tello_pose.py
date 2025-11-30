@@ -26,7 +26,16 @@ class Tello_Pose:
         self.nPoints = 15
         
         # read the neural network of the pose recognition
-        self.net = cv2.dnn.readNetFromCaffe(self.protoFile, self.weightsFile)
+        self.net = None
+        self.model_available = False
+        try:
+            self.net = cv2.dnn.readNetFromCaffe(self.protoFile, self.weightsFile)
+            self.model_available = True
+            print("✓ Pose model loaded successfully")
+        except cv2.error as e:
+            print(f"⚠ Pose model files not found. Gesture recognition disabled.")
+            print(f"  To enable: run 'cd model && ./getModels.sh' (or getModels.bat on Windows)")
+            self.model_available = False
 
         # count the number of frames,and after every certain number of frames
         # is read, frame_cnt will be cleared and recounted.
@@ -137,7 +146,7 @@ class Tello_Pose:
             return False
 
     def is_arms_V(self, points):
-        """
+        r"""
         Determine if the person has his/her shoulder and elbow to a certain degree
         like:   |
               \/|\/
@@ -184,6 +193,10 @@ class Tello_Pose:
                 cmd: the command to be received by Tello
                 points:the coordinates of the skeleton nodes
         """
+        # If model is not available, return empty results
+        if not self.model_available:
+            return False, None, None
+        
         frameWidth = frame.shape[1]
         frameHeight = frame.shape[0]
 

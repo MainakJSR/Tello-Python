@@ -1,0 +1,10 @@
+cd /home/mainak1/development/myWorkspace/Tello/Tello-Python/Single_Tello_Test && source ../../venv/bin/activate && timeout 10 python3 tello_test.py command.txt 2>&1 || true
+source ../../venv/bin/activate && timeout 5 python3 main.py 2>&1 || true
+cd /home/mainak1/development/myWorkspace/Tello
+source venv/bin/activate
+python3 Tello-Python/calibrate_tello.py
+
+# Quick calibration (recommended)
+cd /home/mainak1/development/myWorkspace/Tello/Tello-Python
+source ../venv/bin/activate
+python3 quick_calibrate.py
